@@ -3,5 +3,7 @@ package com.mlynarz.ardena.model;
 public enum Status {
     Cancelled,
     Pending,
-    Confirmed
+    Confirmed,
+    Paid_pass,
+    Paid_cash
 }

@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    boolean existsByLesson_IdAndRider_Id(long lessonId, long riderId);
+    boolean existsByStatusIsNotAndAndLesson_IdAndRider_Id(Status status, long lessonId, long riderId);
     List<Reservation> findByRider_IdAndLessonDateGreaterThanEqualOrderByLessonDate(long riderId, Instant now);
     List<Reservation> findByLesson_Instructor_IdAndStatusAndLessonDateGreaterThanEqualOrderByLessonDate(long riderId, Status status, Instant now);
+    List<Reservation> findByRider_IdAndLessonDateIsLessThanOrderByLessonDateDesc(long riderId, Instant now);
 }
-

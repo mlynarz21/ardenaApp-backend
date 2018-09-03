@@ -9,12 +9,15 @@ import com.mlynarz.ardena.repository.VoteRepository;
 import com.mlynarz.ardena.security.jwt.CurrentUser;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.service.PollService;
+import com.mlynarz.ardena.service.UserService;
 import com.mlynarz.ardena.util.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -32,7 +35,15 @@ public class UserController {
     @Autowired
     private PollService pollService;
 
+    @Autowired
+    private UserService userService;
+
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @GetMapping("/users/instructors")
+    public List<UserSummary> getInstructors(@CurrentUser UserPrincipal currentUser) {
+        return userService.getInstructors();
+    }
 
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")

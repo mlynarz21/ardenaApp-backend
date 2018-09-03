@@ -38,6 +38,11 @@ public class ReservationController {
         return reservationService.getReservationsByUser(currentUser.getId());
     }
 
+    @GetMapping("/history/user")
+    public List<ReservationResponse> getReservationHistoryByUser(@CurrentUser UserPrincipal currentUser) {
+        return reservationService.getReservationHistoryByUser(currentUser.getId());
+    }
+
     @GetMapping("/instructor")
     public List<ReservationResponse> getPendingReservationsByInstructor(@CurrentUser UserPrincipal currentUser) {
         return reservationService.getPendingReservationsByInstructor(currentUser.getId());

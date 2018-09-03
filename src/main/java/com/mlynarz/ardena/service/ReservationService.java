@@ -9,12 +9,16 @@ import com.mlynarz.ardena.repository.LessonRepository;
 import com.mlynarz.ardena.repository.ReservationRepository;
 import com.mlynarz.ardena.repository.UserRepository;
 import com.mlynarz.ardena.util.ModelMapper;
+import com.mlynarz.ardena.util.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mlynarz.ardena.model.Status.*;
 
 @Service
 public class ReservationService {
@@ -27,10 +31,12 @@ public class ReservationService {
     @Autowired
     UserRepository userRepository;
 
+    public static final int CANCELLATION_TIME = 24;
+
     public Reservation addReservation(Long lessonId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
         Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new ResourceNotFoundException("Lesson", "id",lessonId));
-        if(reservationRepository.existsByLesson_IdAndRider_Id(lessonId,userId))
+        if(reservationRepository.existsByStatusIsNotAndAndLesson_IdAndRider_Id(Status.Cancelled,lessonId,userId))
             throw new BadRequestException("This rider already reserved this lesson!");
         if(compareLevels(user.getRiderLevel(),lesson.getLessonLevel())<0)
             throw new BadRequestException("This level is too high for this rider");
@@ -38,7 +44,7 @@ public class ReservationService {
         Reservation newReservation = new Reservation();
         newReservation.setRider(user);
         newReservation.setLesson(lesson);
-        newReservation.setStatus(Status.Pending);
+        newReservation.setStatus(Pending);
 
         return reservationRepository.save(newReservation);
     }
@@ -54,7 +60,15 @@ public class ReservationService {
 
     public List<ReservationResponse> getReservationsByUser(long userId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateGreaterThanEqualOrderByLessonDate(userId, Instant.now()))
+        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateGreaterThanEqualOrderByLessonDate(userId, Timer.getNow()))
+            reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
+
+        return reservationResponses;
+    }
+
+    public List<ReservationResponse> getReservationHistoryByUser(Long userId) {
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateIsLessThanOrderByLessonDateDesc(userId, Timer.getNow()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -62,7 +76,7 @@ public class ReservationService {
 
     public List<ReservationResponse> getPendingReservationsByInstructor(Long instructorId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for(Reservation reservation: reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateGreaterThanEqualOrderByLessonDate(instructorId,Status.Pending, Instant.now()))
+        for(Reservation reservation: reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateGreaterThanEqualOrderByLessonDate(instructorId, Pending, Timer.getNow()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -70,9 +84,17 @@ public class ReservationService {
 
     public void cancelReservation(Long reservationId, Long id) {
         Reservation reservationToCancel = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
-        if(!reservationToCancel.getRider().getId().equals(id) || !reservationToCancel.getLesson().getInstructor().getId().equals(id))
+        if(!reservationToCancel.getRider().getId().equals(id) && !reservationToCancel.getLesson().getInstructor().getId().equals(id))
             throw new ConflictException("You are not the owner of that lesson");
-        reservationToCancel.setStatus(Status.Cancelled);
+        switch (reservationToCancel.getStatus()){
+            case Cancelled:   throw new ConflictException("This lesson was already cancelled");
+            case Paid_cash:   throw new ConflictException("This lesson was already paid");
+            case Paid_pass:   throw new ConflictException("This lesson was already paid");
+        }
+        if(reservationToCancel.getRider().getId().equals(id) && isLessonAfterCancellationTime(reservationToCancel.getLesson().getDate()))
+            throw new ConflictException("You cannot cancel reservation later than " + CANCELLATION_TIME + " hours before");
+
+        reservationToCancel.setStatus(Cancelled);
         reservationRepository.save(reservationToCancel);
     }
 
@@ -80,7 +102,11 @@ public class ReservationService {
         Reservation reservationToAccept = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
         if(!reservationToAccept.getLesson().getInstructor().getId().equals(instructorId))
             throw new ConflictException("You are not the owner of that lesson");
-        reservationToAccept.setStatus(Status.Confirmed);
+        reservationToAccept.setStatus(Confirmed);
         reservationRepository.save(reservationToAccept);
+    }
+
+    private boolean isLessonAfterCancellationTime(Instant instant){
+        return Timer.getNow().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
     }
 }
