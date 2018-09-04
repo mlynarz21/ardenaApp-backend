@@ -82,6 +82,22 @@ public class ReservationService {
         return reservationResponses;
     }
 
+    public List<ReservationResponse> getUnpaidReservationsByUser(Long riderId) {
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for (Reservation reservation : reservationRepository.findByRider_IdAndStatusAndLessonDateIsLessThanOrderByLessonDate(riderId, Status.Confirmed, Timer.getNow()))
+            reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
+
+        return reservationResponses;
+    }
+
+    public List<ReservationResponse> getUnpaidReservationsByInstructor(Long instructorId) {
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for (Reservation reservation : reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateIsLessThanOrderByLessonDate(instructorId, Status.Confirmed, Timer.getNow()))
+            reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
+
+        return reservationResponses;
+    }
+
     public void cancelReservation(Long reservationId, Long id) {
         Reservation reservationToCancel = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
         if(!reservationToCancel.getRider().getId().equals(id) && !reservationToCancel.getLesson().getInstructor().getId().equals(id))
@@ -109,4 +125,5 @@ public class ReservationService {
     private boolean isLessonAfterCancellationTime(Instant instant){
         return Timer.getNow().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
     }
+
 }

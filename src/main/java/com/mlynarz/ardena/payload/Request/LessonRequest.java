@@ -1,7 +1,7 @@
 package com.mlynarz.ardena.payload.Request;
 
-import com.mlynarz.ardena.model.Level;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mlynarz.ardena.model.Level;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;

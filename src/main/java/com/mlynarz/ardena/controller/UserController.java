@@ -1,8 +1,11 @@
 package com.mlynarz.ardena.controller;
 
 import com.mlynarz.ardena.exception.ResourceNotFoundException;
+import com.mlynarz.ardena.model.Level;
+import com.mlynarz.ardena.model.RoleName;
 import com.mlynarz.ardena.model.User;
 import com.mlynarz.ardena.payload.*;
+import com.mlynarz.ardena.payload.Request.RoleRequest;
 import com.mlynarz.ardena.repository.PollRepository;
 import com.mlynarz.ardena.repository.UserRepository;
 import com.mlynarz.ardena.repository.VoteRepository;
@@ -14,9 +17,11 @@ import com.mlynarz.ardena.util.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -41,14 +46,37 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/users/instructors")
-    public List<UserSummary> getInstructors(@CurrentUser UserPrincipal currentUser) {
-        return userService.getInstructors();
+    public List<UserSummary> getInstructors() {
+        return userService.getUsersByRole(RoleName.ROLE_INSTRUCTOR);
+    }
+
+    @GetMapping("/users/admins")
+    public List<UserSummary> getAdmins() {
+        return userService.getUsersByRole(RoleName.ROLE_ADMIN);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("users/role/add/{username}")
+    public ResponseEntity<?> addUserRole(@PathVariable String username, @Valid @RequestBody RoleRequest roleRequest) {
+
+        userService.addUserRole(username, roleRequest);
+
+        return ResponseEntity.ok(new ApiResponse(true, "Role added"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("users/role/remove/{userId}")
+    public ResponseEntity<?> removeUserRole(@PathVariable Long userId, @Valid @RequestBody RoleRequest roleRequest) {
+
+        userService.deleteUserRole(userId, roleRequest);
+
+        return ResponseEntity.ok(new ApiResponse(true, "Role removed"));
     }
 
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
-        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
+        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName(), Level.Basic);
         return userSummary;
     }
 
@@ -92,6 +120,11 @@ public class UserController {
                                                        @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
         return pollService.getPollsVotedBy(username, currentUser, page, size);
+    }
+
+    @GetMapping("/users")
+    public List<UserSummary> getUsers() {
+        return userService.getAllUsers();
     }
 
 }

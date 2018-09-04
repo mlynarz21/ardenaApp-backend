@@ -94,7 +94,7 @@ public class ModelMapper {
     }
 
     public static UserSummary mapUserToUserSummary(User user){
-        return new UserSummary(user.getId(), user.getUsername(), user.getName());
+        return new UserSummary(user.getId(), user.getUsername(), user.getName(), user.getRiderLevel());
     }
 
     public static RoleResponse mapRoleToRoleResponse(Role role){

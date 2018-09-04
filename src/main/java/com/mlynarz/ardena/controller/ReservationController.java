@@ -38,7 +38,7 @@ public class ReservationController {
         return reservationService.getReservationsByUser(currentUser.getId());
     }
 
-    @GetMapping("/history/user")
+    @GetMapping("/user/history")
     public List<ReservationResponse> getReservationHistoryByUser(@CurrentUser UserPrincipal currentUser) {
         return reservationService.getReservationHistoryByUser(currentUser.getId());
     }
@@ -46,6 +46,16 @@ public class ReservationController {
     @GetMapping("/instructor")
     public List<ReservationResponse> getPendingReservationsByInstructor(@CurrentUser UserPrincipal currentUser) {
         return reservationService.getPendingReservationsByInstructor(currentUser.getId());
+    }
+
+    @GetMapping("/instructor/unpaid")
+    public List<ReservationResponse> getUnpaidReservationsByInstructor(@CurrentUser UserPrincipal currentUser) {
+        return reservationService.getUnpaidReservationsByInstructor(currentUser.getId());
+    }
+
+    @GetMapping("/user/unpaid")
+    public List<ReservationResponse> getUnpaidReservationsByUser(@CurrentUser UserPrincipal currentUser) {
+        return reservationService.getUnpaidReservationsByUser(currentUser.getId());
     }
 
     @PatchMapping("cancel/{reservationId}")
