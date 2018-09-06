@@ -1,5 +1,6 @@
 package com.mlynarz.ardena.service;
 
+import com.mlynarz.ardena.exception.BadRequestException;
 import com.mlynarz.ardena.exception.ConflictException;
 import com.mlynarz.ardena.exception.ResourceNotFoundException;
 import com.mlynarz.ardena.model.Lesson;
@@ -113,7 +114,7 @@ public class LessonService {
 
     public Lesson addLesson(LessonRequest lessonRequest, long userId){
         if(Timer.getNow().isAfter(lessonRequest.getDate().toInstant()))
-            throw new ConflictException("Cannot add lesson before now!");
+            throw new BadRequestException("Cannot add lesson before now!");
         Lesson newLesson = new Lesson();
         newLesson.setInstructor(userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId)));
         newLesson.setDate(lessonRequest.getDate().toInstant());
@@ -125,7 +126,7 @@ public class LessonService {
     public void deleteLesson(Long lessonId, Long id) {
         Lesson lessonToDelete = lessonRepository.findById(lessonId).orElseThrow(() -> new ResourceNotFoundException("Lesson", "id",lessonId));
         if(!lessonToDelete.getInstructor().getId().equals(id))
-            throw new ConflictException("You are not the owner of that lesson");
+            throw new BadRequestException("You are not the owner of that lesson");
 
         lessonRepository.delete(lessonToDelete);
     }

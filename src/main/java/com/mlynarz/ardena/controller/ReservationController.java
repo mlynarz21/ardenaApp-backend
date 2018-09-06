@@ -1,16 +1,20 @@
 package com.mlynarz.ardena.controller;
 
+import com.mlynarz.ardena.exception.BadRequestException;
 import com.mlynarz.ardena.model.Reservation;
 import com.mlynarz.ardena.payload.ApiResponse;
+import com.mlynarz.ardena.payload.Request.PaymentRequest;
 import com.mlynarz.ardena.payload.Response.ReservationResponse;
 import com.mlynarz.ardena.security.jwt.CurrentUser;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -72,6 +76,20 @@ public class ReservationController {
         reservationService.acceptReservation(reservationId, currentUser.getId());
 
         return ResponseEntity.ok(new ApiResponse(true, "Reservation accepted"));
+    }
+
+    @PatchMapping("pay/{reservationId}")
+    public ResponseEntity<?> payForReservation(@PathVariable Long reservationId, @Valid @RequestBody PaymentRequest paymentRequest, @CurrentUser UserPrincipal currentUser) {
+
+        switch (paymentRequest.getStatus()){
+            case Paid_cash: reservationService.payForReservationWithCash(reservationId, currentUser.getId());
+                break;
+            case Paid_pass: reservationService.payForReservationWithPass(reservationId, currentUser.getId());
+                break;
+            default:
+                throw new BadRequestException("Unknown payment method");
+        }
+        return ResponseEntity.ok(new ApiResponse(true, "Payment accepted"));
     }
 
 }

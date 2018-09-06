@@ -7,10 +7,7 @@ import com.mlynarz.ardena.payload.Response.*;
 import com.mlynarz.ardena.payload.UserSummary;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ModelMapper {
@@ -99,5 +96,15 @@ public class ModelMapper {
 
     public static RoleResponse mapRoleToRoleResponse(Role role){
         return new RoleResponse(role.getName());
+    }
+
+    public static PassResponse mapPassToPassResponse(Pass pass){
+            PassResponse passResponse = new PassResponse();
+            passResponse.setExpirationDate(pass.getExpirationDate());
+            passResponse.setNoOfRidesPermitted(pass.getNoOfRidesPermitted());
+            passResponse.setUsedRides(pass.getUsedRides());
+            passResponse.setId(pass.getId());
+
+            return passResponse;
     }
 }

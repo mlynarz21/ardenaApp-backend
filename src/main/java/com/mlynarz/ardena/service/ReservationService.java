@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mlynarz.ardena.model.Status.*;
 
@@ -30,6 +31,9 @@ public class ReservationService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PassService passService;
 
     public static final int CANCELLATION_TIME = 24;
 
@@ -101,14 +105,14 @@ public class ReservationService {
     public void cancelReservation(Long reservationId, Long id) {
         Reservation reservationToCancel = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
         if(!reservationToCancel.getRider().getId().equals(id) && !reservationToCancel.getLesson().getInstructor().getId().equals(id))
-            throw new ConflictException("You are not the owner of that lesson");
+            throw new BadRequestException("You are not the owner of that lesson");
         switch (reservationToCancel.getStatus()){
-            case Cancelled:   throw new ConflictException("This lesson was already cancelled");
-            case Paid_cash:   throw new ConflictException("This lesson was already paid");
-            case Paid_pass:   throw new ConflictException("This lesson was already paid");
+            case Cancelled:   throw new BadRequestException("This lesson was already cancelled");
+            case Paid_cash:   throw new BadRequestException("This lesson was already paid (cash)");
+            case Paid_pass:   throw new BadRequestException("This lesson was already paid (pass)");
         }
         if(reservationToCancel.getRider().getId().equals(id) && isLessonAfterCancellationTime(reservationToCancel.getLesson().getDate()))
-            throw new ConflictException("You cannot cancel reservation later than " + CANCELLATION_TIME + " hours before");
+            throw new BadRequestException("You cannot cancel reservation later than " + CANCELLATION_TIME + " hours before");
 
         reservationToCancel.setStatus(Cancelled);
         reservationRepository.save(reservationToCancel);
@@ -117,13 +121,41 @@ public class ReservationService {
     public void acceptReservation(Long reservationId, Long instructorId) {
         Reservation reservationToAccept = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
         if(!reservationToAccept.getLesson().getInstructor().getId().equals(instructorId))
-            throw new ConflictException("You are not the owner of that lesson");
+            throw new BadRequestException("You are not the owner of that lesson");
         reservationToAccept.setStatus(Confirmed);
         reservationRepository.save(reservationToAccept);
     }
 
     private boolean isLessonAfterCancellationTime(Instant instant){
         return Timer.getNow().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
+    }
+
+    public void payForReservationWithCash(long reservationId, long userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
+        if(reservation.getStatus()!=Status.Confirmed){
+            throw new BadRequestException("This reservation was already paid or is not obliged to pay");
+        } else if(user.getId()==reservation.getLesson().getInstructor().getId()) {
+            reservation.setStatus(Status.Paid_cash);
+            reservationRepository.save(reservation);
+        }
+        else throw new BadRequestException("You are not the instructor of that lesson");
+    }
+
+    public void payForReservationWithPass(long reservationId, long userId){
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
+        if(reservation.getLesson().getInstructor().getId()!=userId && reservation.getRider().getId()!=userId)
+            throw new BadRequestException("You are not the owner of that lesson");
+        Pass userPass = passService.getValidPass(userId);
+        if(reservation.getStatus()!=Status.Confirmed){
+            throw new BadRequestException("This reservation was already paid or is not obliged to pay");
+        } else {
+            reservation.setStatus(Status.Paid_pass);
+            reservationRepository.save(reservation);
+            userPass.setUsedRides(userPass.getUsedRides()+1);
+            passService.updatePass(userPass);
+        }
+
     }
 
 }

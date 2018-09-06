@@ -1,18 +1,10 @@
-package com.mlynarz.ardena.model;
+package com.mlynarz.ardena.payload.Response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.time.Instant;
 
-@Entity
-@Table(name = "passes")
-public class Pass implements Serializable {
+public class PassResponse{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -24,12 +16,7 @@ public class Pass implements Serializable {
     @NotNull
     private int noOfRidesPermitted;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
-
-    public Pass(){
+    public PassResponse(){
 
     }
 
@@ -65,11 +52,4 @@ public class Pass implements Serializable {
         this.noOfRidesPermitted = noOfRidesPermitted;
     }
 
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
 }
