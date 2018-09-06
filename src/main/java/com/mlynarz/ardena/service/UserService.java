@@ -6,6 +6,7 @@ import com.mlynarz.ardena.model.Role;
 import com.mlynarz.ardena.model.RoleName;
 import com.mlynarz.ardena.model.User;
 import com.mlynarz.ardena.payload.Request.RoleRequest;
+import com.mlynarz.ardena.payload.Request.UserRequest;
 import com.mlynarz.ardena.payload.UserSummary;
 import com.mlynarz.ardena.repository.RoleRepository;
 import com.mlynarz.ardena.repository.UserRepository;
@@ -66,4 +67,9 @@ public class UserService {
     }
 
 
+    public void setUserLevel(Long userId, UserRequest userRequest) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
+        user.setRiderLevel(userRequest.getLevel());
+        userRepository.save(user);
+    }
 }

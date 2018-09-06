@@ -48,4 +48,13 @@ public class HorseController {
 
         return ResponseEntity.ok(new ApiResponse(true, "Horse deleted"));
     }
+
+    @PatchMapping("/{horseId}")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<?> updateHorse(@PathVariable Long horseId, @Valid @RequestBody HorseRequest horseRequest) {
+        horseService.updateHorse(horseId, horseRequest);
+
+        return ResponseEntity.ok(new ApiResponse(true, "Horse updated"));
+
+    }
 }

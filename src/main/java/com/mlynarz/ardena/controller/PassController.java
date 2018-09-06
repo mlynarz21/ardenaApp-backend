@@ -24,9 +24,9 @@ public class PassController {
     @Autowired
     PassService passService;
 
-    @GetMapping("/user")
-    public PassResponse getUserPass(@CurrentUser UserPrincipal currentUser) {
-        return ModelMapper.mapPassToPassResponse(passService.getValidPass(currentUser.getId()));
+    @GetMapping("{username}")
+    public PassResponse getUserPass(@PathVariable String username) {
+        return ModelMapper.mapPassToPassResponse(passService.getValidPassByUsername(username));
     }
 
     @PostMapping("{userId}")

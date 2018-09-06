@@ -23,7 +23,14 @@ public class PassService {
     UserRepository userRepository;
 
     public Pass getValidPass(long userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
         return passRepository.findByExpirationDateBeforeAndOwner_IdAndUsedRidesIsLessThanNoOfRidesPermitted(Instant.now(), userId)
+                .orElseThrow(() -> new BadRequestException("This user has no valid passes"));
+    }
+
+    public Pass getValidPassByUsername(String username){
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username",username));
+        return passRepository.findByExpirationDateBeforeAndOwner_IdAndUsedRidesIsLessThanNoOfRidesPermitted(Instant.now(), user.getId())
                 .orElseThrow(() -> new BadRequestException("This user has no valid passes"));
     }
 

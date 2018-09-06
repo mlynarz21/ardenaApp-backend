@@ -7,6 +7,7 @@ import com.mlynarz.ardena.model.RoleName;
 import com.mlynarz.ardena.model.User;
 import com.mlynarz.ardena.payload.*;
 import com.mlynarz.ardena.payload.Request.RoleRequest;
+import com.mlynarz.ardena.payload.Request.UserRequest;
 import com.mlynarz.ardena.payload.Response.PassResponse;
 import com.mlynarz.ardena.repository.PollRepository;
 import com.mlynarz.ardena.repository.UserRepository;
@@ -129,6 +130,16 @@ public class UserController {
     @GetMapping("/users")
     public List<UserSummary> getUsers() {
         return userService.getAllUsers();
+    }
+
+
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PatchMapping("users/{userId}")
+    public ResponseEntity<?> changeUserLevel(@PathVariable Long userId, @Valid @RequestBody UserRequest userRequest) {
+
+        userService.setUserLevel(userId, userRequest);
+
+        return ResponseEntity.ok(new ApiResponse(true, "Level changed"));
     }
 
 }

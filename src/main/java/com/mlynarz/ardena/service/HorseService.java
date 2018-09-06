@@ -10,6 +10,7 @@ import com.mlynarz.ardena.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,4 +48,14 @@ public class HorseService {
 
         horseRepository.delete(horse);
     }
+
+    public void updateHorse(long id, HorseRequest horseRequest) {
+        if(horseRepository.existsByHorseName(horseRequest.getHorseName())) {
+            throw new ConflictException("Horse with that name already exists!");
+        }
+        Horse horse = horseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Horse", "id", id));
+        horse.setHorseName(horseRequest.getHorseName());
+        horseRepository.save(horse);
+        }
 }
