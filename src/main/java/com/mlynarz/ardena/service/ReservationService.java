@@ -4,15 +4,20 @@ import com.mlynarz.ardena.exception.BadRequestException;
 import com.mlynarz.ardena.exception.ConflictException;
 import com.mlynarz.ardena.exception.ResourceNotFoundException;
 import com.mlynarz.ardena.model.*;
+import com.mlynarz.ardena.payload.Request.ReservationRequest;
+import com.mlynarz.ardena.payload.Response.HorseResponse;
 import com.mlynarz.ardena.payload.Response.ReservationResponse;
+import com.mlynarz.ardena.repository.HorseRepository;
 import com.mlynarz.ardena.repository.LessonRepository;
 import com.mlynarz.ardena.repository.ReservationRepository;
 import com.mlynarz.ardena.repository.UserRepository;
+import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.util.ModelMapper;
 import com.mlynarz.ardena.util.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -31,6 +36,9 @@ public class ReservationService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    HorseRepository horseRepository;
 
     @Autowired
     PassService passService;
@@ -158,4 +166,19 @@ public class ReservationService {
 
     }
 
+    public void updateReservation(Long reservationId, @Valid ReservationRequest reservationRequest, UserPrincipal currentUser) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
+        if(reservation.getLesson().getInstructor().getId()!=currentUser.getId()){
+            throw new BadRequestException("You are not the owner of that lesson");
+        }
+        else {
+            Horse horse = horseRepository.findByHorseName(reservationRequest.getHorseName()).orElseThrow(() -> new ResourceNotFoundException("Horse", "name",reservationRequest.getHorseName()));
+            User user = userRepository.findById(reservationRequest.getRider().getId()).orElseThrow(() -> new ResourceNotFoundException("User", "id",reservationRequest.getRider().getId()));
+
+            reservation.setStatus(reservationRequest.getStatus());
+            reservation.setRider(user);
+            reservation.setHorse(horse);
+            reservationRepository.save(reservation);
+        }
+    }
 }

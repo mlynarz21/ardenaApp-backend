@@ -6,16 +6,19 @@ import com.mlynarz.ardena.exception.ResourceNotFoundException;
 import com.mlynarz.ardena.model.Lesson;
 import com.mlynarz.ardena.model.Reservation;
 import com.mlynarz.ardena.model.Status;
+import com.mlynarz.ardena.model.User;
 import com.mlynarz.ardena.payload.Request.DateRequest;
 import com.mlynarz.ardena.payload.Request.LessonRequest;
 import com.mlynarz.ardena.payload.Response.LessonResponse;
 import com.mlynarz.ardena.repository.LessonRepository;
 import com.mlynarz.ardena.repository.UserRepository;
+import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.util.ModelMapper;
 import com.mlynarz.ardena.util.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -134,5 +137,15 @@ public class LessonService {
     public LessonResponse getLessonById(Long lessonId) {
         Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new ResourceNotFoundException("Lesson", "id",lessonId));
         return ModelMapper.mapLessonToLessonResponse(lesson);
+    }
+
+    public void updateLesson(Long lessonId, LessonRequest lessonRequest, UserPrincipal currentUser) {
+        Lesson lessonToUpdate = lessonRepository.findById(lessonId).orElseThrow(() -> new ResourceNotFoundException("Lesson", "id",lessonId));
+        if(!lessonToUpdate.getInstructor().getId().equals(currentUser.getId()))
+            throw new BadRequestException("You are not the owner of that lesson");
+        lessonToUpdate.setInstructor(userRepository.findByUsername(lessonRequest.getInstructor()).orElseThrow(() -> new ResourceNotFoundException("User", "username",lessonRequest.getInstructor())));
+        lessonToUpdate.setDate(lessonRequest.getDate().toInstant());
+        lessonToUpdate.setLessonLevel(lessonRequest.getLessonLevel());
+        lessonRepository.save(lessonToUpdate);
     }
 }

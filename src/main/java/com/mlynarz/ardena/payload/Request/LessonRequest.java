@@ -10,6 +10,8 @@ public class LessonRequest {
 
     private Level lessonLevel;
 
+    private String instructor;
+
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm")
     @NotNull
     private Date date;
@@ -34,4 +36,11 @@ public class LessonRequest {
         this.date = date;
     }
 
+    public String getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(String instructor) {
+        this.instructor = instructor;
+    }
 }

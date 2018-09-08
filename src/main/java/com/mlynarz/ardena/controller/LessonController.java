@@ -82,4 +82,11 @@ public class LessonController {
         return ResponseEntity.ok(new ApiResponse(true, "Lesson deleted"));
     }
 
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PatchMapping("{lessonId}")
+    public ResponseEntity<?> updateLesson(@PathVariable Long lessonId, @Valid @RequestBody LessonRequest lessonRequest, @CurrentUser UserPrincipal currentUser) {
+        lessonService.updateLesson(lessonId, lessonRequest, currentUser);
+        return ResponseEntity.ok(new ApiResponse(true, "Lesson updated"));
+    }
+
 }

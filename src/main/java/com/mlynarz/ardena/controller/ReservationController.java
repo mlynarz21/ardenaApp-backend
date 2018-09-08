@@ -4,6 +4,7 @@ import com.mlynarz.ardena.exception.BadRequestException;
 import com.mlynarz.ardena.model.Reservation;
 import com.mlynarz.ardena.payload.ApiResponse;
 import com.mlynarz.ardena.payload.Request.PaymentRequest;
+import com.mlynarz.ardena.payload.Request.ReservationRequest;
 import com.mlynarz.ardena.payload.Response.ReservationResponse;
 import com.mlynarz.ardena.security.jwt.CurrentUser;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
@@ -11,6 +12,7 @@ import com.mlynarz.ardena.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -90,6 +92,13 @@ public class ReservationController {
                 throw new BadRequestException("Unknown payment method");
         }
         return ResponseEntity.ok(new ApiResponse(true, "Payment accepted"));
+    }
+
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PatchMapping("{reservationId}")
+    public ResponseEntity<?> updateReservation(@PathVariable Long reservationId, @Valid @RequestBody ReservationRequest reservationRequest, @CurrentUser UserPrincipal currentUser) {
+        reservationService.updateReservation(reservationId, reservationRequest, currentUser);
+        return ResponseEntity.ok(new ApiResponse(true, "Reservation updated"));
     }
 
 }
