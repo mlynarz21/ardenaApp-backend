@@ -30,6 +30,11 @@ public class LessonController {
         return lessonService.getAllLessons();
     }
 
+    @GetMapping("/coming")
+    public List<LessonResponse> getComingLessons() {
+        return lessonService.getAllComingLessons();
+    }
+
     @GetMapping("/{lessonId}")
     public LessonResponse getLessonById(@PathVariable Long lessonId) {
         return lessonService.getLessonById(lessonId);

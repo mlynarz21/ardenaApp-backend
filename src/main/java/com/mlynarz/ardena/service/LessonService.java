@@ -95,6 +95,15 @@ public class LessonService {
         return false;
     }
 
+    public List<LessonResponse> getAllComingLessons(){
+
+        List<LessonResponse> lessonResponses = new ArrayList<>();
+        for(Lesson lesson: lessonRepository.findByDateGreaterThanEqual(Instant.now()))
+            lessonResponses.add(ModelMapper.mapLessonToLessonResponse(lesson));
+
+        return lessonResponses;
+    }
+
     public List<LessonResponse> getAllLessons(){
 
         List<LessonResponse> lessonResponses = new ArrayList<>();
