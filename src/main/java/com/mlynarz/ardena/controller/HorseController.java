@@ -1,7 +1,7 @@
 package com.mlynarz.ardena.controller;
 
 import com.mlynarz.ardena.model.Horse;
-import com.mlynarz.ardena.payload.ApiResponse;
+import com.mlynarz.ardena.payload.Response.ApiResponse;
 import com.mlynarz.ardena.payload.Request.HorseRequest;
 import com.mlynarz.ardena.payload.Response.HorseResponse;
 import com.mlynarz.ardena.service.HorseService;

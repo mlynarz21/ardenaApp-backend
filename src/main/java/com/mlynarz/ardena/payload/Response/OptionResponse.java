@@ -1,6 +1,6 @@
-package com.mlynarz.ardena.payload;
+package com.mlynarz.ardena.payload.Response;
 
-public class ChoiceResponse {
+public class OptionResponse {
     private long id;
     private String text;
     private long voteCount;

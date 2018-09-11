@@ -2,7 +2,7 @@ package com.mlynarz.ardena.controller;
 
 import com.mlynarz.ardena.exception.BadRequestException;
 import com.mlynarz.ardena.model.Reservation;
-import com.mlynarz.ardena.payload.ApiResponse;
+import com.mlynarz.ardena.payload.Response.ApiResponse;
 import com.mlynarz.ardena.payload.Request.PaymentRequest;
 import com.mlynarz.ardena.payload.Request.ReservationRequest;
 import com.mlynarz.ardena.payload.Response.ReservationResponse;
@@ -10,7 +10,6 @@ import com.mlynarz.ardena.security.jwt.CurrentUser;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

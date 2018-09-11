@@ -1,9 +1,9 @@
-package com.mlynarz.ardena.payload;
+package com.mlynarz.ardena.payload.Request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class ChoiceRequest {
+public class OptionRequest {
     @NotBlank
     @Size(max = 40)
     private String text;

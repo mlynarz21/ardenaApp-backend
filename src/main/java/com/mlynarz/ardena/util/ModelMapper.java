@@ -1,8 +1,8 @@
 package com.mlynarz.ardena.util;
 
 import com.mlynarz.ardena.model.*;
-import com.mlynarz.ardena.payload.ChoiceResponse;
-import com.mlynarz.ardena.payload.PollResponse;
+import com.mlynarz.ardena.payload.Response.OptionResponse;
+import com.mlynarz.ardena.payload.Response.EventResponse;
 import com.mlynarz.ardena.payload.Response.*;
 import com.mlynarz.ardena.payload.UserSummary;
 
@@ -12,39 +12,39 @@ import java.util.stream.Collectors;
 
 public class ModelMapper {
 
-    public static PollResponse mapPollToPollResponse(Poll poll, Map<Long, Long> choiceVotesMap, User creator, Long userVote) {
-        PollResponse pollResponse = new PollResponse();
-        pollResponse.setId(poll.getId());
-        pollResponse.setQuestion(poll.getQuestion());
-        pollResponse.setCreationDateTime(poll.getCreatedAt());
-        pollResponse.setExpirationDateTime(poll.getExpirationDateTime());
+    public static EventResponse mapEventToEventResponse(Event event, Map<Long, Long> optionVotesMap, User creator, Long userVote) {
+        EventResponse eventResponse = new EventResponse();
+        eventResponse.setId(event.getId());
+        eventResponse.setDescription(event.getDescription());
+        eventResponse.setCreationDateTime(event.getCreatedAt());
+        eventResponse.setEventDate(event.getEventDate());
         Instant now = Instant.now();
-        pollResponse.setExpired(poll.getExpirationDateTime().isBefore(now));
+        eventResponse.setExpired(event.getEventDate().isBefore(now));
 
-        List<ChoiceResponse> choiceResponses = poll.getChoices().stream().map(choice -> {
-            ChoiceResponse choiceResponse = new ChoiceResponse();
-            choiceResponse.setId(choice.getId());
-            choiceResponse.setText(choice.getText());
+        List<OptionResponse> optionRespons = event.getOptions().stream().map(option -> {
+            OptionResponse optionResponse = new OptionResponse();
+            optionResponse.setId(option.getId());
+            optionResponse.setText(option.getText());
 
-            if (choiceVotesMap.containsKey(choice.getId())) {
-                choiceResponse.setVoteCount(choiceVotesMap.get(choice.getId()));
+            if (optionVotesMap.containsKey(option.getId())) {
+                optionResponse.setVoteCount(optionVotesMap.get(option.getId()));
             } else {
-                choiceResponse.setVoteCount(0);
+                optionResponse.setVoteCount(0);
             }
-            return choiceResponse;
+            return optionResponse;
         }).collect(Collectors.toList());
 
-        pollResponse.setChoices(choiceResponses);
-        pollResponse.setCreatedBy(mapUserToUserSummary(creator));
+        eventResponse.setOptions(optionRespons);
+        eventResponse.setCreatedBy(mapUserToUserSummary(creator));
 
         if (userVote != null) {
-            pollResponse.setSelectedChoice(userVote);
+            eventResponse.setSelectedOption(userVote);
         }
 
-        long totalVotes = pollResponse.getChoices().stream().mapToLong(ChoiceResponse::getVoteCount).sum();
-        pollResponse.setTotalVotes(totalVotes);
+        long totalVotes = eventResponse.getOptions().stream().mapToLong(OptionResponse::getVoteCount).sum();
+        eventResponse.setTotalVotes(totalVotes);
 
-        return pollResponse;
+        return eventResponse;
     }
 
     public static HorseResponse mapHorseToHorseResponse(Horse horse) {

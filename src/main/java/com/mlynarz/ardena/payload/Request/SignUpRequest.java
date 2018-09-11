@@ -1,4 +1,4 @@
-package com.mlynarz.ardena.payload;
+package com.mlynarz.ardena.payload.Request;
 
 import javax.validation.constraints.*;
 

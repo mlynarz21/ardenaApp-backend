@@ -1,11 +1,9 @@
 package com.mlynarz.ardena.controller;
 
 import com.mlynarz.ardena.model.Pass;
-import com.mlynarz.ardena.payload.ApiResponse;
+import com.mlynarz.ardena.payload.Response.ApiResponse;
 import com.mlynarz.ardena.payload.Request.PassRequest;
 import com.mlynarz.ardena.payload.Response.PassResponse;
-import com.mlynarz.ardena.security.jwt.CurrentUser;
-import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.service.PassService;
 import com.mlynarz.ardena.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

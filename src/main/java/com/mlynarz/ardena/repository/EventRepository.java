@@ -1,6 +1,6 @@
 package com.mlynarz.ardena.repository;
 
-import com.mlynarz.ardena.model.Poll;
+import com.mlynarz.ardena.model.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PollRepository extends JpaRepository<Poll, Long> {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
-    Optional<Poll> findById(Long pollId);
+    Optional<Event> findById(Long eventId);
 
-    Page<Poll> findByCreatedBy(Long userId, Pageable pageable);
+    Page<Event> findByCreatedBy(Long userId, Pageable pageable);
 
     long countByCreatedBy(Long userId);
 
-    List<Poll> findByIdIn(List<Long> pollIds);
+    List<Event> findByIdIn(List<Long> eventIds);
 
-    List<Poll> findByIdIn(List<Long> pollIds, Sort sort);
+    List<Event> findByIdIn(List<Long> eventIds, Sort sort);
 }

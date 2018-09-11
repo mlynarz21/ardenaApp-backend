@@ -8,16 +8,16 @@ public class UserProfile {
     private String username;
     private String name;
     private Instant joinedAt;
-    private Long pollCount;
+    private Long eventCount;
     private Long voteCount;
     private Level level;
 
-    public UserProfile(Long id, String username, String name, Instant joinedAt, Long pollCount, Long voteCount, Level level) {
+    public UserProfile(Long id, String username, String name, Instant joinedAt, Long eventCount, Long voteCount, Level level) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.joinedAt = joinedAt;
-        this.pollCount = pollCount;
+        this.eventCount = eventCount;
         this.voteCount = voteCount;
         this.level = level;
     }
@@ -54,12 +54,12 @@ public class UserProfile {
         this.joinedAt = joinedAt;
     }
 
-    public Long getPollCount() {
-        return pollCount;
+    public Long getEventCount() {
+        return eventCount;
     }
 
-    public void setPollCount(Long pollCount) {
-        this.pollCount = pollCount;
+    public void setEventCount(Long eventCount) {
+        this.eventCount = eventCount;
     }
 
     public Long getVoteCount() {

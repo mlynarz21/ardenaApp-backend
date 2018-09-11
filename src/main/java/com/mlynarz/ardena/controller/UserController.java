@@ -2,23 +2,22 @@ package com.mlynarz.ardena.controller;
 
 import com.mlynarz.ardena.exception.ResourceNotFoundException;
 import com.mlynarz.ardena.model.Level;
-import com.mlynarz.ardena.model.Pass;
 import com.mlynarz.ardena.model.RoleName;
 import com.mlynarz.ardena.model.User;
 import com.mlynarz.ardena.payload.*;
 import com.mlynarz.ardena.payload.Request.RoleRequest;
 import com.mlynarz.ardena.payload.Request.UserRequest;
-import com.mlynarz.ardena.payload.Response.PassResponse;
-import com.mlynarz.ardena.repository.PollRepository;
+import com.mlynarz.ardena.payload.Response.ApiResponse;
+import com.mlynarz.ardena.payload.Response.EventResponse;
+import com.mlynarz.ardena.payload.Response.PagedResponse;
+import com.mlynarz.ardena.repository.EventRepository;
 import com.mlynarz.ardena.repository.UserRepository;
 import com.mlynarz.ardena.repository.VoteRepository;
 import com.mlynarz.ardena.security.jwt.CurrentUser;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
-import com.mlynarz.ardena.service.PassService;
-import com.mlynarz.ardena.service.PollService;
+import com.mlynarz.ardena.service.EventService;
 import com.mlynarz.ardena.service.UserService;
 import com.mlynarz.ardena.util.AppConstants;
-import com.mlynarz.ardena.util.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +36,13 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
-    private PollRepository pollRepository;
+    private EventRepository eventRepository;
 
     @Autowired
     private VoteRepository voteRepository;
 
     @Autowired
-    private PollService pollService;
+    private EventService eventService;
 
     @Autowired
     private UserService userService;
@@ -102,29 +101,29 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
-        long pollCount = pollRepository.countByCreatedBy(user.getId());
+        long eventCount = eventRepository.countByCreatedBy(user.getId());
         long voteCount = voteRepository.countByUserId(user.getId());
 
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), pollCount, voteCount, user.getRiderLevel());
+        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), eventCount, voteCount, user.getRiderLevel());
 
         return userProfile;
     }
 
-    @GetMapping("/users/{username}/polls")
-    public PagedResponse<PollResponse> getPollsCreatedBy(@PathVariable(value = "username") String username,
-                                                         @CurrentUser UserPrincipal currentUser,
-                                                         @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                         @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return pollService.getPollsCreatedBy(username, currentUser, page, size);
+    @GetMapping("/users/{username}/events")
+    public PagedResponse<EventResponse> getEventsCreatedBy(@PathVariable(value = "username") String username,
+                                                          @CurrentUser UserPrincipal currentUser,
+                                                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        return eventService.getEventsCreatedBy(username, currentUser, page, size);
     }
 
 
     @GetMapping("/users/{username}/votes")
-    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username") String username,
-                                                       @CurrentUser UserPrincipal currentUser,
-                                                       @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                       @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return pollService.getPollsVotedBy(username, currentUser, page, size);
+    public PagedResponse<EventResponse> getEventsVotedBy(@PathVariable(value = "username") String username,
+                                                        @CurrentUser UserPrincipal currentUser,
+                                                        @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        return eventService.getEventsVotedBy(username, currentUser, page, size);
     }
 
     @GetMapping("/users")

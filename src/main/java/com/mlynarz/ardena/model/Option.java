@@ -6,8 +6,8 @@ import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
-@Table(name = "choices")
-public class Choice {
+@Table(name = "options")
+public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,14 +17,14 @@ public class Choice {
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "poll_id", nullable = false)
-    private Poll poll;
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
 
-    public Choice() {
+    public Option() {
 
     }
 
-    public Choice(String text) {
+    public Option(String text) {
         this.text = text;
     }
 
@@ -44,20 +44,20 @@ public class Choice {
         this.text = text;
     }
 
-    public Poll getPoll() {
-        return poll;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setPoll(Poll poll) {
-        this.poll = poll;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Choice choice = (Choice) o;
-        return Objects.equals(id, choice.id);
+        Option option = (Option) o;
+        return Objects.equals(id, option.id);
     }
 
     @Override

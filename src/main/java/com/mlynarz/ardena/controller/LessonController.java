@@ -1,7 +1,7 @@
 package com.mlynarz.ardena.controller;
 
 import com.mlynarz.ardena.model.Lesson;
-import com.mlynarz.ardena.payload.ApiResponse;
+import com.mlynarz.ardena.payload.Response.ApiResponse;
 import com.mlynarz.ardena.payload.Request.DateRequest;
 import com.mlynarz.ardena.payload.Request.LessonRequest;
 import com.mlynarz.ardena.payload.Response.LessonResponse;

@@ -1,21 +1,22 @@
-package com.mlynarz.ardena.payload;
+package com.mlynarz.ardena.payload.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mlynarz.ardena.payload.UserSummary;
 
 import java.time.Instant;
 import java.util.List;
 
-public class PollResponse {
+public class EventResponse {
     private Long id;
-    private String question;
-    private List<ChoiceResponse> choices;
+    private String description;
+    private List<OptionResponse> options;
     private UserSummary createdBy;
     private Instant creationDateTime;
-    private Instant expirationDateTime;
+    private Instant eventDate;
     private Boolean isExpired;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long selectedChoice;
+    private Long selectedOption;
     private Long totalVotes;
 
     public Long getId() {
@@ -26,20 +27,20 @@ public class PollResponse {
         this.id = id;
     }
 
-    public String getQuestion() {
-        return question;
+    public String getDescription() {
+        return description;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public List<ChoiceResponse> getChoices() {
-        return choices;
+    public List<OptionResponse> getOptions() {
+        return options;
     }
 
-    public void setChoices(List<ChoiceResponse> choices) {
-        this.choices = choices;
+    public void setOptions(List<OptionResponse> options) {
+        this.options = options;
     }
 
     public UserSummary getCreatedBy() {
@@ -59,12 +60,12 @@ public class PollResponse {
         this.creationDateTime = creationDateTime;
     }
 
-    public Instant getExpirationDateTime() {
-        return expirationDateTime;
+    public Instant getEventDate() {
+        return eventDate;
     }
 
-    public void setExpirationDateTime(Instant expirationDateTime) {
-        this.expirationDateTime = expirationDateTime;
+    public void setEventDate(Instant eventDate) {
+        this.eventDate = eventDate;
     }
 
     public Boolean getExpired() {
@@ -75,12 +76,12 @@ public class PollResponse {
         isExpired = expired;
     }
 
-    public Long getSelectedChoice() {
-        return selectedChoice;
+    public Long getSelectedOption() {
+        return selectedOption;
     }
 
-    public void setSelectedChoice(Long selectedChoice) {
-        this.selectedChoice = selectedChoice;
+    public void setSelectedOption(Long selectedOption) {
+        this.selectedOption = selectedOption;
     }
 
     public Long getTotalVotes() {

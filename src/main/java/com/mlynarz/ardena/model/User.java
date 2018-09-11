@@ -153,19 +153,27 @@ public class User extends DateAudit {
         this.riderLevel = riderLevel;
     }
 
-//    public List<Reservation> getReservations() {
-//        return reservations;
-//    }
-//
-//    public void setReservations(List<Reservation> reservations) {
-//        this.reservations = reservations;
-//    }
-//
-//    public List<Pass> getPasses() {
-//        return passes;
-//    }
-//
-//    public void setPasses(List<Pass> passes) {
-//        this.passes = passes;
-//    }
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
+    public List<Pass> getPasses() {
+        return passes;
+    }
+
+    public void setPasses(List<Pass> passes) {
+        this.passes = passes;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
 }

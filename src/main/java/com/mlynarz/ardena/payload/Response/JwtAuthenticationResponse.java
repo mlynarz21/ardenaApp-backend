@@ -1,4 +1,4 @@
-package com.mlynarz.ardena.payload;
+package com.mlynarz.ardena.payload.Response;
 
 import com.mlynarz.ardena.payload.Response.RoleResponse;
 
