@@ -1,11 +1,9 @@
 package com.mlynarz.ardena.service;
 
 import com.mlynarz.ardena.exception.BadRequestException;
-import com.mlynarz.ardena.exception.ConflictException;
 import com.mlynarz.ardena.exception.ResourceNotFoundException;
 import com.mlynarz.ardena.model.*;
 import com.mlynarz.ardena.payload.Request.ReservationRequest;
-import com.mlynarz.ardena.payload.Response.HorseResponse;
 import com.mlynarz.ardena.payload.Response.ReservationResponse;
 import com.mlynarz.ardena.repository.HorseRepository;
 import com.mlynarz.ardena.repository.LessonRepository;
@@ -13,7 +11,6 @@ import com.mlynarz.ardena.repository.ReservationRepository;
 import com.mlynarz.ardena.repository.UserRepository;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.util.ModelMapper;
-import com.mlynarz.ardena.util.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +19,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mlynarz.ardena.model.Status.*;
 
@@ -72,7 +68,7 @@ public class ReservationService {
 
     public List<ReservationResponse> getReservationsByUser(long userId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateGreaterThanEqualOrderByLessonDate(userId, Timer.getNow()))
+        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateGreaterThanEqualOrderByLessonDate(userId, Instant.now()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -80,7 +76,7 @@ public class ReservationService {
 
     public List<ReservationResponse> getReservationHistoryByUser(Long userId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateIsLessThanOrderByLessonDateDesc(userId, Timer.getNow()))
+        for(Reservation reservation: reservationRepository.findByRider_IdAndLessonDateIsLessThanOrderByLessonDateDesc(userId, Instant.now()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -88,7 +84,7 @@ public class ReservationService {
 
     public List<ReservationResponse> getPendingReservationsByInstructor(Long instructorId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for(Reservation reservation: reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateGreaterThanEqualOrderByLessonDate(instructorId, Pending, Timer.getNow()))
+        for(Reservation reservation: reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateGreaterThanEqualOrderByLessonDate(instructorId, Pending, Instant.now()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -96,7 +92,7 @@ public class ReservationService {
 
     public List<ReservationResponse> getUnpaidReservationsByUser(Long riderId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for (Reservation reservation : reservationRepository.findByRider_IdAndStatusAndLessonDateIsLessThanOrderByLessonDate(riderId, Status.Confirmed, Timer.getNow()))
+        for (Reservation reservation : reservationRepository.findByRider_IdAndStatusAndLessonDateIsLessThanOrderByLessonDate(riderId, Status.Confirmed, Instant.now()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -104,7 +100,7 @@ public class ReservationService {
 
     public List<ReservationResponse> getUnpaidReservationsByInstructor(Long instructorId) {
         List<ReservationResponse> reservationResponses = new ArrayList<>();
-        for (Reservation reservation : reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateIsLessThanOrderByLessonDate(instructorId, Status.Confirmed, Timer.getNow()))
+        for (Reservation reservation : reservationRepository.findByLesson_Instructor_IdAndStatusAndLessonDateIsLessThanOrderByLessonDate(instructorId, Status.Confirmed, Instant.now()))
             reservationResponses.add(ModelMapper.mapReservationToReservationResponse(reservation));
 
         return reservationResponses;
@@ -135,7 +131,7 @@ public class ReservationService {
     }
 
     private boolean isLessonAfterCancellationTime(Instant instant){
-        return Timer.getNow().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
+        return Instant.now().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
     }
 
     public void payForReservationWithCash(long reservationId, long userId){

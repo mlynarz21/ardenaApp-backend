@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mlynarz.ardena.model.Level;
 
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.Date;
 
 public class LessonRequest {
@@ -12,9 +13,9 @@ public class LessonRequest {
 
     private String instructor;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm")
     @NotNull
-    private Date date;
+    private Instant date;
 
     public LessonRequest(){
 
@@ -28,11 +29,11 @@ public class LessonRequest {
         this.lessonLevel = lessonLevel;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

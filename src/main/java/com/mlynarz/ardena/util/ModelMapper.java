@@ -18,7 +18,7 @@ public class ModelMapper {
         pollResponse.setQuestion(poll.getQuestion());
         pollResponse.setCreationDateTime(poll.getCreatedAt());
         pollResponse.setExpirationDateTime(poll.getExpirationDateTime());
-        Instant now = Timer.getNow();
+        Instant now = Instant.now();
         pollResponse.setExpired(poll.getExpirationDateTime().isBefore(now));
 
         List<ChoiceResponse> choiceResponses = poll.getChoices().stream().map(choice -> {
@@ -58,7 +58,7 @@ public class ModelMapper {
     public static LessonResponse mapLessonToLessonResponse(Lesson lesson) {
         LessonResponse lessonResponse = new LessonResponse();
         lessonResponse.setId(lesson.getId());
-        lessonResponse.setDate(Date.from(lesson.getDate()));
+        lessonResponse.setDate(lesson.getDate());
         lessonResponse.setLessonLevel(lesson.getLessonLevel());
         lessonResponse.setInstructor(mapUserToUserSummary(lesson.getInstructor()));
         List<LessonReservationResponse> lessonReservationResponses = new ArrayList<>();

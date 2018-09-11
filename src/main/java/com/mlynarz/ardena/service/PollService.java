@@ -13,7 +13,6 @@ import com.mlynarz.ardena.repository.VoteRepository;
 import com.mlynarz.ardena.security.jwt.UserPrincipal;
 import com.mlynarz.ardena.util.AppConstants;
 import com.mlynarz.ardena.util.ModelMapper;
-import com.mlynarz.ardena.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,7 +151,7 @@ public class PollService {
             poll.addChoice(new Choice(choiceRequest.getText()));
         });
 
-        Instant now = Timer.getNow();
+        Instant now = Instant.now();
         Instant expirationDateTime = now.plus(Duration.ofDays(pollRequest.getPollLength().getDays()))
                 .plus(Duration.ofHours(pollRequest.getPollLength().getHours()));
 
@@ -189,7 +188,7 @@ public class PollService {
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new ResourceNotFoundException("Poll", "id", pollId));
 
-        if(poll.getExpirationDateTime().isBefore(Timer.getNow())) {
+        if(poll.getExpirationDateTime().isBefore(Instant.now())) {
             throw new BadRequestException("Sorry! This Poll has already expired");
         }
 
