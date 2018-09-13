@@ -13,7 +13,7 @@ public class EventRequest {
     private String description;
 
     @NotNull
-    @Size(min = 1, max = 6)
+    @Size(max = 6)
     @Valid
     private List<OptionRequest> options;
 

@@ -28,7 +28,7 @@ public class HorseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addHorse(@Valid @RequestBody HorseRequest horseRequest) {
         Horse horse = horseService.addHorse(horseRequest);
 
@@ -41,7 +41,7 @@ public class HorseController {
     }
 
     @DeleteMapping("/{horseId}")
-    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteHorse(@PathVariable Long horseId) {
 
         horseService.deleteHorse(horseId);
@@ -50,7 +50,7 @@ public class HorseController {
     }
 
     @PatchMapping("/{horseId}")
-    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateHorse(@PathVariable Long horseId, @Valid @RequestBody HorseRequest horseRequest) {
         horseService.updateHorse(horseId, horseRequest);
 

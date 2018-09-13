@@ -29,7 +29,7 @@ public class Event extends UserDateAudit {
             fetch = FetchType.EAGER,
             orphanRemoval = true
     )
-    @Size(min = 1, max = 6)
+    @Size(max = 6)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 30)
     private List<Option> options = new ArrayList<>();
