@@ -55,6 +55,5 @@ public class HorseController {
         horseService.updateHorse(horseId, horseRequest);
 
         return ResponseEntity.ok(new ApiResponse(true, "Horse updated"));
-
     }
 }

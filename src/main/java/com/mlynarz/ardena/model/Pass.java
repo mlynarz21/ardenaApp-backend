@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "passes")
@@ -71,5 +72,22 @@ public class Pass implements Serializable {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pass pass = (Pass) o;
+        return usedRides == pass.usedRides &&
+                noOfRidesPermitted == pass.noOfRidesPermitted &&
+                Objects.equals(expirationDate, pass.expirationDate) &&
+                Objects.equals(owner, pass.owner);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(expirationDate, usedRides, noOfRidesPermitted, owner);
     }
 }

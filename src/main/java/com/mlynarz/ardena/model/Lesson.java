@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "lessons")
@@ -38,6 +39,12 @@ public class Lesson implements Serializable {
 
     public Lesson(){
 
+    }
+
+    public Lesson(Level lessonLevel, @NotNull Instant date, User instructor) {
+        this.lessonLevel = lessonLevel;
+        this.date = date;
+        this.instructor = instructor;
     }
 
     public Long getId() {
@@ -78,5 +85,22 @@ public class Lesson implements Serializable {
 
     public void setInstructor(User instructor) {
         this.instructor = instructor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Lesson lesson = (Lesson) o;
+        return lessonLevel == lesson.lessonLevel &&
+                Objects.equals(date, lesson.date) &&
+                Objects.equals(reservations, lesson.reservations) &&
+                Objects.equals(instructor, lesson.instructor);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(lessonLevel, date, reservations, instructor);
     }
 }

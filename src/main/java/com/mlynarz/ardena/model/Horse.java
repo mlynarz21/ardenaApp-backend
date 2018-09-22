@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "horses",uniqueConstraints = {
@@ -33,6 +34,10 @@ public class Horse implements Serializable {
 
     }
 
+    public Horse(String horseName){
+        this.horseName=horseName;
+    }
+
     public Long getId() {
         return id;
     }
@@ -55,5 +60,20 @@ public class Horse implements Serializable {
 
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Horse horse = (Horse) o;
+        return Objects.equals(horseName, horse.horseName) &&
+                Objects.equals(reservations, horse.reservations);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(horseName, reservations);
     }
 }
