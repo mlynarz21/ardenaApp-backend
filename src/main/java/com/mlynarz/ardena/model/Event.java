@@ -23,6 +23,9 @@ public class Event extends UserDateAudit {
 //    @Size(max = 140)
     private String description;
 
+    @NotNull
+    private Instant eventDate;
+
     @OneToMany(
             mappedBy = "event",
             cascade = CascadeType.ALL,
@@ -33,9 +36,6 @@ public class Event extends UserDateAudit {
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 30)
     private List<Option> options = new ArrayList<>();
-
-    @NotNull
-    private Instant eventDate;
 
     public Long getId() {
         return id;
