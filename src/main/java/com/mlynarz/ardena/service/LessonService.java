@@ -29,6 +29,9 @@ public class LessonService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    EmailService emailService;
+
     private static final int MAX_USERS_ON_LESSON = 2;
 
     public List<LessonResponse> getLessonsByDate(DateRequest dateRequest){
@@ -154,6 +157,10 @@ public class LessonService {
         if(!lessonToDelete.getInstructor().getId().equals(id))
             throw new BadRequestException("You are not the owner of that lesson");
 
+        for (Reservation r : lessonToDelete.getReservations()) {
+            sendCancellationMail(r.getRider().getEmail(), lessonToDelete);
+        }
+
         lessonRepository.delete(lessonToDelete);
     }
 
@@ -192,5 +199,10 @@ public class LessonService {
             return -1;
         else
             return 1;
+    }
+
+    private void sendCancellationMail(String toAddress, Lesson lesson) {
+        String message = "The lesson in our stable on: "+ Date.from(lesson.getDate())+" was cancelled by "+lesson.getInstructor().getName();
+        emailService.sendSimpleMessage(toAddress, "Lesson Cancelled", message);
     }
 }

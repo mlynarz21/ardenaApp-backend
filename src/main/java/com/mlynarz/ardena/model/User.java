@@ -5,7 +5,9 @@ import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,10 +45,15 @@ public class User extends DateAudit {
     @Size(max = 100)
     private String password;
 
+    @NotBlank
     @Size(min = 9, max = 9)
     private String phoneNumber;
 
+    @NotNull
     private Level riderLevel;
+
+    @NotNull
+    private Instant birthDate;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
@@ -87,6 +94,15 @@ public class User extends DateAudit {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public User(String name, String username, String email, String password, String phone, Instant date) {
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phone;
+        this.birthDate = date;
     }
 
     public Long getId() {
@@ -175,5 +191,13 @@ public class User extends DateAudit {
 
     public void setLessons(List<Lesson> lessons) {
         this.lessons = lessons;
+    }
+
+    public Instant getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Instant birthDate) {
+        this.birthDate = birthDate;
     }
 }

@@ -1,6 +1,7 @@
 package com.mlynarz.ardena.payload.Request;
 
 import javax.validation.constraints.*;
+import java.time.Instant;
 
 
 public class SignUpRequest {
@@ -20,6 +21,13 @@ public class SignUpRequest {
     @NotBlank
     @Size(min = 6, max = 20)
     private String password;
+
+    @NotBlank
+    @Size(min = 9, max = 9)
+    private String phoneNumber;
+
+    @NotNull
+    private Instant birthDate;
 
     public String getName() {
         return name;
@@ -51,5 +59,21 @@ public class SignUpRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Instant getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Instant birthDate) {
+        this.birthDate = birthDate;
     }
 }
