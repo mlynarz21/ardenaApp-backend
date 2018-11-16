@@ -3,6 +3,7 @@ package com.mlynarz.ardena.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ public class Horse implements Serializable {
     @NotBlank
     @Size(max = 25)
     private String horseName;
+
+    @NotNull
+    private Level horseLevel;
 
     @JsonIgnore
     @OneToMany(
@@ -60,6 +64,14 @@ public class Horse implements Serializable {
 
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    public Level getHorseLevel() {
+        return horseLevel;
+    }
+
+    public void setHorseLevel(Level horseLevel) {
+        this.horseLevel = horseLevel;
     }
 
     @Override

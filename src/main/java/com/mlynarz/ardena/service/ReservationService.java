@@ -180,6 +180,8 @@ public class ReservationService {
 
             if(reservation.getStatus().equals(Status.Cancelled))
                 throw new BadRequestException("This reservation was cancelled!");
+            if(compareLevels(user.getRiderLevel(),horse.getHorseLevel())<0)
+                throw new BadRequestException("This horse has higher level than rider!");
 
             if(canHorseBeAssigned(reservation, horse)) {
                 reservation.setStatus(reservationRequest.getStatus());

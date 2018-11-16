@@ -1,7 +1,10 @@
 package com.mlynarz.ardena.payload;
+
 import com.mlynarz.ardena.model.Level;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 public class UserProfile {
     private Long id;
@@ -11,8 +14,10 @@ public class UserProfile {
     private Long eventCount;
     private Long voteCount;
     private Level level;
+    private String phoneNumber;
+    private long age;
 
-    public UserProfile(Long id, String username, String name, Instant joinedAt, Long eventCount, Long voteCount, Level level) {
+    public UserProfile(Long id, String username, String name, Instant joinedAt, Long eventCount, Long voteCount, Level level, String phoneNumber, Instant birthDate) {
         this.id = id;
         this.username = username;
         this.name = name;
@@ -20,6 +25,8 @@ public class UserProfile {
         this.eventCount = eventCount;
         this.voteCount = voteCount;
         this.level = level;
+        this.phoneNumber = phoneNumber;
+        this.age = ChronoUnit.YEARS.between(birthDate.atZone(ZoneId.systemDefault()),Instant.now().atZone(ZoneId.systemDefault()));
     }
 
     public Long getId() {
@@ -76,5 +83,20 @@ public class UserProfile {
 
     public void setLevel(Level level) {
         this.level = level;
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public long getAge() {
+        return age;
+    }
+
+    public void setAge(long age) {
+        this.age = age;
     }
 }

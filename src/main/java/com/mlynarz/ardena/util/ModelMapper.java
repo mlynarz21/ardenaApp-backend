@@ -51,6 +51,7 @@ public class ModelMapper {
         HorseResponse horseResponse = new HorseResponse();
         horseResponse.setHorseName(horse.getHorseName());
         horseResponse.setId(horse.getId());
+        horseResponse.setHorseLevel(horse.getHorseLevel());
 
         return horseResponse;
     }
