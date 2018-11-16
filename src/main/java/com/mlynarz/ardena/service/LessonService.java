@@ -2,9 +2,7 @@ package com.mlynarz.ardena.service;
 
 import com.mlynarz.ardena.exception.BadRequestException;
 import com.mlynarz.ardena.exception.ResourceNotFoundException;
-import com.mlynarz.ardena.model.Lesson;
-import com.mlynarz.ardena.model.Reservation;
-import com.mlynarz.ardena.model.Status;
+import com.mlynarz.ardena.model.*;
 import com.mlynarz.ardena.payload.Request.DateRequest;
 import com.mlynarz.ardena.payload.Request.LessonRequest;
 import com.mlynarz.ardena.payload.Response.LessonResponse;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +29,8 @@ public class LessonService {
     @Autowired
     UserRepository userRepository;
 
+    private static final int MAX_USERS_ON_LESSON = 2;
+
     public List<LessonResponse> getLessonsByDate(DateRequest dateRequest){
 
         Instant dayStart = Instant.now();
@@ -42,8 +43,9 @@ public class LessonService {
         dayEnd = dayEnd.plus(Duration.ofMinutes(59));
 
         List<LessonResponse> lessonResponses = new ArrayList<>();
-        for(Lesson lesson: lessonRepository.findByDateGreaterThanEqualAndDateBetweenOrderByDate(Instant.now(),dayStart, dayEnd))
+        for(Lesson lesson: lessonRepository.findByDateGreaterThanEqualAndDateBetweenOrderByDate(Instant.now(),dayStart, dayEnd)) {
             lessonResponses.add(ModelMapper.mapLessonToLessonResponse(lesson));
+        }
 
         return lessonResponses;
     }
@@ -60,8 +62,11 @@ public class LessonService {
         dayEnd = dayEnd.plus(Duration.ofMinutes(59));
 
         List<LessonResponse> lessonResponses = new ArrayList<>();
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
         for(Lesson lesson: lessonRepository.findByDateGreaterThanEqualAndDateBetweenOrderByDate(Instant.now(),dayStart, dayEnd)) {
-            if (!containsUserUnCancelledReservations(lesson.getReservations(), userId))
+            if (!containsUserUnCancelledReservations(lesson.getReservations(), userId)
+                    && getActiveReservationCountForLesson(lesson) < MAX_USERS_ON_LESSON
+                    && compareLevels(user.getRiderLevel(),lesson.getLessonLevel())>0)
                 lessonResponses.add(ModelMapper.mapLessonToLessonResponse(lesson));
         }
 
@@ -95,11 +100,16 @@ public class LessonService {
         return false;
     }
 
-    public List<LessonResponse> getAllComingLessons(){
+    public List<LessonResponse> getAllComingLessons(UserPrincipal currentUser){
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new ResourceNotFoundException("User", "id",currentUser.getId()));
 
         List<LessonResponse> lessonResponses = new ArrayList<>();
         for(Lesson lesson: lessonRepository.findByDateGreaterThanEqual(Instant.now()))
-            lessonResponses.add(ModelMapper.mapLessonToLessonResponse(lesson));
+            if (!containsUserUnCancelledReservations(lesson.getReservations(), currentUser.getId())
+                    && getActiveReservationCountForLesson(lesson) < MAX_USERS_ON_LESSON
+                    && compareLevels(user.getRiderLevel(),lesson.getLessonLevel())>0) {
+                lessonResponses.add(ModelMapper.mapLessonToLessonResponse(lesson));
+            }
 
         return lessonResponses;
     }
@@ -122,12 +132,19 @@ public class LessonService {
     }
 
     public Lesson addLesson(LessonRequest lessonRequest, long userId){
+        Lesson newLesson = new Lesson();
+
         if(Instant.now().isAfter(lessonRequest.getDate()))
             throw new BadRequestException("Cannot add lesson before now!");
-        Lesson newLesson = new Lesson();
-        newLesson.setInstructor(userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId)));
-        newLesson.setDate(lessonRequest.getDate());
-        newLesson.setLessonLevel(lessonRequest.getLessonLevel());
+
+        User instructor = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
+
+        if(isInstructorFree(lessonRequest.getDate(), instructor)) {
+            newLesson.setInstructor(instructor);
+            newLesson.setDate(lessonRequest.getDate());
+            newLesson.setLessonLevel(lessonRequest.getLessonLevel());
+        }
+        else throw new BadRequestException("You already have lesson on that date!");
 
         return lessonRepository.save(newLesson);
     }
@@ -153,5 +170,27 @@ public class LessonService {
         lessonToUpdate.setDate(lessonRequest.getDate());
         lessonToUpdate.setLessonLevel(lessonRequest.getLessonLevel());
         lessonRepository.save(lessonToUpdate);
+    }
+
+    private boolean isInstructorFree(Instant date, User instructor){
+        return lessonRepository.findByInstructorAndDateBetween(instructor, date.minus(1, ChronoUnit.MINUTES), date.plus(1, ChronoUnit.MINUTES))==null;
+    }
+
+    private int getActiveReservationCountForLesson(Lesson lesson) {
+        int counter=0;
+        for (Reservation r : lesson.getReservations()) {
+            if(!r.getStatus().equals(Status.Cancelled))
+                counter++;
+        }
+        return counter;
+    }
+
+    private int compareLevels(Level l1, Level other) {
+        if(other.ordinal() < l1.ordinal())
+            return 1;
+        else if(other.ordinal() > l1.ordinal())
+            return -1;
+        else
+            return 1;
     }
 }
