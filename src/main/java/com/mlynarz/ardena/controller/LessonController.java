@@ -31,8 +31,8 @@ public class LessonController {
     }
 
     @GetMapping("/coming")
-    public List<LessonResponse> getComingLessons() {
-        return lessonService.getAllComingLessons();
+    public List<LessonResponse> getComingLessons(@CurrentUser UserPrincipal currentUser) {
+        return lessonService.getAllComingLessons(currentUser);
     }
 
     @GetMapping("/{lessonId}")

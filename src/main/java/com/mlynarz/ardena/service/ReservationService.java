@@ -18,6 +18,8 @@ import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static com.mlynarz.ardena.model.Status.*;
@@ -39,7 +41,9 @@ public class ReservationService {
     @Autowired
     PassService passService;
 
-    public static final int CANCELLATION_TIME = 24;
+    private static final int CANCELLATION_TIME = 24;
+    private static final int HORSE_MAX_OCCURRENCE = 3;
+    private static final int MAX_USERS_ON_LESSON = 2;
 
     public Reservation addReservation(Long lessonId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
@@ -48,6 +52,8 @@ public class ReservationService {
             throw new BadRequestException("This rider already reserved this lesson!");
         if(compareLevels(user.getRiderLevel(),lesson.getLessonLevel())<0)
             throw new BadRequestException("This level is too high for this rider");
+        if(getActiveReservationCount(lesson.getReservations())>=MAX_USERS_ON_LESSON)
+            throw new BadRequestException("There are too many riders on this lesson already!");
 
         Reservation newReservation = new Reservation();
         newReservation.setRider(user);
@@ -119,6 +125,7 @@ public class ReservationService {
             throw new BadRequestException("You cannot cancel reservation later than " + CANCELLATION_TIME + " hours before");
 
         reservationToCancel.setStatus(Cancelled);
+        reservationToCancel.setHorse(null);
         reservationRepository.save(reservationToCancel);
     }
 
@@ -150,7 +157,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
         if(reservation.getLesson().getInstructor().getId()!=userId && reservation.getRider().getId()!=userId)
             throw new BadRequestException("You are not the owner of that lesson");
-        Pass userPass = passService.getValidPass(userId);
+        Pass userPass = passService.getValidPass(reservation.getRider().getId());
         if(reservation.getStatus()!=Status.Confirmed){
             throw new BadRequestException("This reservation was already paid or is not obliged to pay");
         } else {
@@ -171,10 +178,57 @@ public class ReservationService {
             Horse horse = horseRepository.findByHorseName(reservationRequest.getHorseName()).orElseThrow(() -> new ResourceNotFoundException("Horse", "name",reservationRequest.getHorseName()));
             User user = userRepository.findById(reservationRequest.getRider().getId()).orElseThrow(() -> new ResourceNotFoundException("User", "id",reservationRequest.getRider().getId()));
 
-            reservation.setStatus(reservationRequest.getStatus());
-            reservation.setRider(user);
-            reservation.setHorse(horse);
-            reservationRepository.save(reservation);
+            if(reservation.getStatus().equals(Status.Cancelled))
+                throw new BadRequestException("This reservation was cancelled!");
+
+            if(canHorseBeAssigned(reservation, horse)) {
+                reservation.setStatus(reservationRequest.getStatus());
+                reservation.setRider(user);
+                reservation.setHorse(horse);
+                reservationRepository.save(reservation);
+            }
+            else throw new BadRequestException("This horse cannot be asigned!");
         }
+    }
+
+    private boolean canHorseBeAssigned(Reservation reservation, Horse horse){
+        int horseOccurrence=0;
+
+        for (Reservation r: reservation.getLesson().getReservations()) {
+            if(horse.equals(r.getHorse()))
+                return false;
+        }
+
+        for (Lesson l: getAllLessonsForDay(reservation)) {
+            for (Reservation r :l.getReservations()) {
+                if(horse.equals(r.getHorse())){
+                    horseOccurrence++;
+                }
+            }
+        }
+
+        return horseOccurrence < HORSE_MAX_OCCURRENCE;
+    }
+
+    private List<Lesson> getAllLessonsForDay(Reservation reservation){
+        Instant dayStart = Instant.now();
+        Instant dayEnd = Instant.now();
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(Date.from(reservation.getLesson().getDate()));
+        calendar1.set(calendar1.get(Calendar.YEAR),calendar1.get(Calendar.MONTH),calendar1.get(Calendar.DAY_OF_MONTH),0,0,0);
+        dayStart = calendar1.toInstant();
+        dayEnd = dayStart.plus(Duration.ofHours(23));
+        dayEnd = dayEnd.plus(Duration.ofMinutes(59));
+
+        return lessonRepository.findByDateBetween(dayStart,dayEnd);
+    }
+
+    private int getActiveReservationCount(List<Reservation> reservations) {
+        int counter=0;
+        for (Reservation r : reservations) {
+            if(!r.getStatus().equals(Status.Cancelled))
+                counter++;
+        }
+        return counter;
     }
 }
