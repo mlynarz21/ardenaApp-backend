@@ -104,9 +104,7 @@ public class UserController {
         long eventCount = eventRepository.countByCreatedBy(user.getId());
         long voteCount = voteRepository.countByUserId(user.getId());
 
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), eventCount, voteCount, user.getRiderLevel());
-
-        return userProfile;
+        return new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), eventCount, voteCount, user.getRiderLevel(), user.getPhoneNumber(), user.getBirthDate());
     }
 
     @GetMapping("/users/{username}/events")
