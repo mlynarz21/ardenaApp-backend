@@ -36,6 +36,12 @@ public class Reservation implements Serializable {
 
     }
 
+    public Reservation(@NotNull Status status, User rider, Lesson lesson) {
+        this.status = status;
+        this.rider = rider;
+        this.lesson = lesson;
+    }
+
     public Long getId() {
         return id;
     }

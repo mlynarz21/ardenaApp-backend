@@ -46,13 +46,13 @@ public class ReservationService {
     private static final int MAX_USERS_ON_LESSON = 2;
 
     public Reservation addReservation(Long lessonId, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
-        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new ResourceNotFoundException("Lesson", "id",lessonId));
-        if(reservationRepository.existsByStatusIsNotAndAndLesson_IdAndRider_Id(Status.Cancelled,lessonId,userId))
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", lessonId));
+        if (reservationRepository.existsByStatusIsNotAndLesson_IdAndRider_Id(Status.Cancelled, lessonId, userId))
             throw new BadRequestException("This rider already reserved this lesson!");
-        if(compareLevels(user.getRiderLevel(),lesson.getLessonLevel())<0)
+        if (compareLevels(user.getRiderLevel(), lesson.getLessonLevel()) < 0)
             throw new BadRequestException("This level is too high for this rider");
-        if(getActiveReservationCount(lesson.getReservations())>=MAX_USERS_ON_LESSON)
+        if (getActiveReservationCount(lesson.getReservations()) >= MAX_USERS_ON_LESSON)
             throw new BadRequestException("There are too many riders on this lesson already!");
 
         Reservation newReservation = new Reservation();

@@ -89,13 +89,6 @@ public class User extends DateAudit {
 
     }
 
-    public User(String name, String username, String email, String password) {
-        this.name = name;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
     public User(String name, String username, String email, String password, String phone, Instant date) {
         this.name = name;
         this.username = username;
@@ -103,6 +96,7 @@ public class User extends DateAudit {
         this.password = password;
         this.phoneNumber = phone;
         this.birthDate = date;
+        this.riderLevel= Level.Basic;
     }
 
     public Long getId() {

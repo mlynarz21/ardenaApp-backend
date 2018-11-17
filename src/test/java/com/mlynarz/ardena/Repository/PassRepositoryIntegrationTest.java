@@ -34,7 +34,7 @@ public class PassRepositoryIntegrationTest {
     @Test
     public void whenFindByExpirationDateBeforeAndOwnerIdAndUsedRidesIsLessThanNoOfRidesPermitted_thenReturnPass() {
         // given
-        User user = new User("name", "username", "email@hotmail.com", "ppppp");
+        User user = new User("name", "username", "email@hotmail.com", "ppppp", "111111111", Instant.now());
         entityManager.persist(user);
 
         Pass pass = new Pass();
@@ -56,7 +56,7 @@ public class PassRepositoryIntegrationTest {
     @Test
     public void whenFindByExpirationDateBeforeAndOwnerIdAndUsedRidesIsLessThanNoOfRidesPermitted_Expired_thenReturnEmpty() {
         // given
-        User user = new User("name", "username", "email@hotmail.com", "ppppp");
+        User user = new User("name", "username", "email@hotmail.com", "ppppp", "111111111", Instant.now());
         entityManager.persist(user);
 
         Pass pass = new Pass();
@@ -78,7 +78,7 @@ public class PassRepositoryIntegrationTest {
     @Test
     public void whenFindByExpirationDateBeforeAndOwnerIdAndUsedRidesIsLessThanNoOfRidesPermitted_UsedRidesEqualToPermitted_thenReturnEmpty() {
         // given
-        User user = new User("name", "username", "email@hotmail.com", "ppppp");
+        User user = new User("name", "username", "email@hotmail.com", "ppppp", "111111111", Instant.now());
         entityManager.persist(user);
 
         Pass pass = new Pass();
@@ -100,7 +100,7 @@ public class PassRepositoryIntegrationTest {
     @Test
     public void whenFindByExpirationDateBeforeAndOwnerIdAndUsedRidesIsLessThanNoOfRidesPermitted_UsedRidesEqualToPermittedAndExpired_thenReturnEmpty() {
         // given
-        User user = new User("name", "username", "email@hotmail.com", "ppppp");
+        User user = new User("name", "username", "email@hotmail.com", "ppppp", "111111111", Instant.now());
         entityManager.persist(user);
 
         Pass pass = new Pass();
@@ -122,8 +122,8 @@ public class PassRepositoryIntegrationTest {
     @Test
     public void whenFindByExpirationDateBeforeAndOwnerIdAndUsedRidesIsLessThanNoOfRidesPermitted_NoUserPasses_thenReturnEmpty() {
         // given
-        User user = new User("name", "username", "email@hotmail.com", "ppppp");
-        User user2 = new User("name2", "username2", "email2@hotmail.com", "ppppp");
+        User user = new User("name", "username", "email@hotmail.com", "ppppp", "111111111", Instant.now());
+        User user2 = new User("name2", "username2", "email2@hotmail.com", "ppppp", "111111111", Instant.now());
         entityManager.persist(user);
         entityManager.persist(user2);
 

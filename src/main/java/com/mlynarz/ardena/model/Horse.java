@@ -38,8 +38,9 @@ public class Horse implements Serializable {
 
     }
 
-    public Horse(String horseName){
+    public Horse(String horseName, Level horseLevel){
         this.horseName=horseName;
+        this.horseLevel=horseLevel;
     }
 
     public Long getId() {
