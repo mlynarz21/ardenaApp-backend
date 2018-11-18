@@ -16,6 +16,10 @@ public class DateRequest {
 
     }
 
+    public DateRequest(@NotNull Instant date) {
+        this.date = date;
+    }
+
     public Instant getDate() {
         return date;
     }

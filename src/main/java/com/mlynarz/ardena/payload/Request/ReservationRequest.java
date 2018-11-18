@@ -18,6 +18,12 @@ public class ReservationRequest{
 
     }
 
+    public ReservationRequest(@NotNull Status status, User rider, String horseName) {
+        this.status = status;
+        this.rider = rider;
+        this.horseName = horseName;
+    }
+
     public Status getStatus() {
         return status;
     }

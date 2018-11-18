@@ -21,6 +21,12 @@ public class LessonRequest {
 
     }
 
+    public LessonRequest(Level lessonLevel, String instructor, @NotNull Instant date) {
+        this.lessonLevel = lessonLevel;
+        this.instructor = instructor;
+        this.date = date;
+    }
+
     public Level getLessonLevel() {
         return lessonLevel;
     }

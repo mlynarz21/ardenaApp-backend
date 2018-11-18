@@ -43,7 +43,7 @@ public class ReservationService {
 
     private static final int CANCELLATION_TIME = 24;
     private static final int HORSE_MAX_OCCURRENCE = 3;
-    private static final int MAX_USERS_ON_LESSON = 2;
+    public static final int MAX_USERS_ON_LESSON = 5;
 
     public Reservation addReservation(Long lessonId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -61,15 +61,6 @@ public class ReservationService {
         newReservation.setStatus(Pending);
 
         return reservationRepository.save(newReservation);
-    }
-
-    private int compareLevels(Level l1, Level other) {
-        if(other.ordinal() < l1.ordinal())
-            return 1;
-        else if(other.ordinal() > l1.ordinal())
-            return -1;
-        else
-            return 1;
     }
 
     public List<ReservationResponse> getReservationsByUser(long userId) {
@@ -137,10 +128,6 @@ public class ReservationService {
         reservationRepository.save(reservationToAccept);
     }
 
-    private boolean isLessonAfterCancellationTime(Instant instant){
-        return Instant.now().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
-    }
-
     public void payForReservationWithCash(long reservationId, long userId){
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",userId));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation", "id",reservationId));
@@ -193,6 +180,10 @@ public class ReservationService {
         }
     }
 
+    private boolean isLessonAfterCancellationTime(Instant instant){
+        return Instant.now().isAfter(instant.minus(Duration.ofHours(CANCELLATION_TIME)));
+    }
+
     private boolean canHorseBeAssigned(Reservation reservation, Horse horse){
         int horseOccurrence=0;
 
@@ -232,5 +223,14 @@ public class ReservationService {
                 counter++;
         }
         return counter;
+    }
+
+    private int compareLevels(Level l1, Level other) {
+        if(other.ordinal() < l1.ordinal())
+            return 1;
+        else if(other.ordinal() > l1.ordinal())
+            return -1;
+        else
+            return 1;
     }
 }
