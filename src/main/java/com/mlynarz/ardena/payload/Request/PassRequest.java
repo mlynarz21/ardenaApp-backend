@@ -11,6 +11,10 @@ public class PassRequest{
 
     }
 
+    public PassRequest(@NotNull int noOfRidesPermitted) {
+        this.noOfRidesPermitted = noOfRidesPermitted;
+    }
+
     public int getNoOfRidesPermitted() {
         return noOfRidesPermitted;
     }

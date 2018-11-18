@@ -7,6 +7,14 @@ public class HorseRequest {
     private String horseName;
     private Level horseLevel;
 
+    public HorseRequest() {
+    }
+
+    public HorseRequest(String horseName, Level horseLevel) {
+        this.horseName = horseName;
+        this.horseLevel = horseLevel;
+    }
+
     public String getHorseName() {
         return horseName;
     }

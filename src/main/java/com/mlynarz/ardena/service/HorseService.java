@@ -28,7 +28,7 @@ public class HorseService {
     }
 
     public Horse addHorse(HorseRequest horseRequest) {
-        if (horseRepository.existsByHorseName(horseRequest.getHorseName())) {
+        if (canAddHorseWithName(horseRequest.getHorseName())) {
             throw new ConflictException("Horse with that name already exists!");
         }
         Horse newHorse = new Horse();
